@@ -1,24 +1,39 @@
-CC = gcc
-CFLAGS = -ansi -pedantic -Wall
-INCLUDES = -I./include   # Add this to tell gcc where to find header files
-SRC_DIR = ./src          # Specify the directory where the source files are
+# Set include path
+INCLUDES = -I./src/include
 
-# List of object files
-OBJ = $(SRC_DIR)/pre_assembler.o $(SRC_DIR)/general.o $(SRC_DIR)/front_end.o \
-      $(SRC_DIR)/first_pass.o $(SRC_DIR)/second_pass.o $(SRC_DIR)/back_end.o \
-      $(SRC_DIR)/assembler.o
-
-# Default target: all
 all: assembler
 
-# Linking object files to create the executable
-assembler: $(OBJ)
-	$(CC) $(CFLAGS) $(INCLUDES) -o assembler $(OBJ)
+assembler: pre_assembler.o general.o front_end.o first_pass.o second_pass.o back_end.o assembler.o
+	gcc $(INCLUDES) -ansi -pedantic -Wall -o assembler pre_assembler.o general.o front_end.o first_pass.o second_pass.o back_end.o assembler.o
 
-# Compilation rules for .c files
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+pre_assembler.o: src/pre_assembler.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/pre_assembler.c
 
-# Clean up object files and the executable
+general.o: src/general.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/general.c
+
+front_end.o: src/front_end.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/front_end.c
+
+first_pass.o: src/first_pass.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/first_pass.c
+
+second_pass.o: src/second_pass.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/second_pass.c
+
+back_end.o: src/back_end.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/back_end.c
+
+assembler.o: src/assembler.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c src/assembler.c
+
 clean:
-	rm -f $(SRC_DIR)/*.o assembler
+	rm *.o assembler
+
+# Optional: test target (if you want to run tests)
+test: test_main.o assembler.o
+	gcc $(INCLUDES) -o test_runner test_main.o assembler.o
+	./test_runner
+
+test_main.o: test/test_main.c
+	gcc $(INCLUDES) -ansi -pedantic -Wall -c test/test_main.c
